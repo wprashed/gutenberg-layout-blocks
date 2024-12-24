@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg Layout Blocks
  * Description: Custom layout blocks for the Gutenberg editor
  * Version: 1.0.0
- * Author: Your Name
+ * Author: Rashed Hossain
  */
 
 if (!defined('ABSPATH')) {
