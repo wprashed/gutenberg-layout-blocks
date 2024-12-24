@@ -4,33 +4,6 @@
     position: relative;
 }
 
-.gutenberg-layout-blocks-container .background-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
-}
-
-.gutenberg-layout-blocks-container .shape-divider {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-    transform: rotate(180deg);
-}
-
-.gutenberg-layout-blocks-container .shape-divider svg {
-    position: relative;
-    display: block;
-    width: calc(100% + 1.3px);
-    height: 150px;
-}
-
 .gutenberg-layout-blocks-tabs {
     display: flex;
     border-bottom: 1px solid #e2e4e7;
@@ -90,21 +63,6 @@
     margin-top: 16px;
 }
 
-.column-resizer {
-    position: absolute;
-    top: 0;
-    right: -5px;
-    width: 10px;
-    height: 100%;
-    cursor: col-resize;
-    z-index: 1;
-}
-
-.column-resizer:hover,
-.column-resizer:active {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
 .gutenberg-layout-blocks-row {
     display: flex;
     flex-wrap: wrap;
@@ -112,5 +70,37 @@
 
 .gutenberg-layout-blocks-column {
     flex-grow: 1;
+}
+
+.block-editor-block-list__block .gutenberg-layout-blocks-container,
+.block-editor-block-list__block .gutenberg-layout-blocks-row,
+.block-editor-block-list__block .gutenberg-layout-blocks-column {
+    border: 1px dashed #8d96a0;
+}
+
+.block-editor-block-list__block.is-selected .gutenberg-layout-blocks-container,
+.block-editor-block-list__block.is-selected .gutenberg-layout-blocks-row,
+.block-editor-block-list__block.is-selected .gutenberg-layout-blocks-column {
+    border: 1px solid #007cba;
+}
+
+.column-resizer {
+    width: 5px;
+    background: #007cba;
+    cursor: col-resize;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -2.5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.gutenberg-layout-blocks-column:hover .column-resizer {
+    opacity: 0.5;
+}
+
+.gutenberg-layout-blocks-column .column-resizer:active {
+    opacity: 1;
 }
 
