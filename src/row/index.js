@@ -1,9 +1,7 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks, InspectorControls, ColorPalette } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, SelectControl, ToggleControl, Button } from '@wordpress/components';
-import { useState, useRef, useEffect } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { PanelBody, RangeControl, SelectControl, ToggleControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 registerBlockType('gutenberg-layout-blocks/row', {
     title: 'Row',
@@ -14,16 +12,12 @@ registerBlockType('gutenberg-layout-blocks/row', {
         contentPosition: { type: 'string', default: 'top' },
         contentWidth: { type: 'string', default: 'full' },
         columnCount: { type: 'number', default: 2 },
-        columnWidths: { type: 'array', default: [] },
         backgroundColor: { type: 'string', default: '' },
-        padding: { type: 'object', default: { top: 10, right: 10, bottom: 10, left: 10, unit: 'px' } },
+        padding: { type:'object', default: { top: 10, right: 10, bottom: 10, left: 10, unit: 'px' } },
         margin: { type: 'object', default: { top: 0, right: 0, bottom: 0, left: 0, unit: 'px' } },
     },
-    edit: ({ attributes, setAttributes, clientId }) => {
+    edit: ({ attributes, setAttributes }) => {
         const [activeTab, setActiveTab] = useState('layout');
-        const rowRef = useRef(null);
-        const { replaceInnerBlocks } = useDispatch('core/block-editor');
-        const { getBlocks } = useSelect((select) => select('core/block-editor'), []);
 
         const updateSpacing = (type, side, value) => {
             setAttributes({
@@ -33,85 +27,6 @@ registerBlockType('gutenberg-layout-blocks/row', {
                 }
             });
         };
-
-        const updateColumnCount = (count) => {
-            const currentBlocks = getBlocks(clientId);
-            const newColumnWidths = Array(count).fill(100 / count);
-            
-            // Create new column blocks or remove excess
-            const updatedBlocks = Array(count).fill().map((_, index) => {
-                if (currentBlocks[index]) {
-                    return {
-                        ...currentBlocks[index],
-                        attributes: {
-                            ...currentBlocks[index].attributes,
-                            width: newColumnWidths[index]
-                        }
-                    };
-                }
-                return createBlock('gutenberg-layout-blocks/column', { width: newColumnWidths[index] });
-            });
-
-            replaceInnerBlocks(clientId, updatedBlocks, false);
-            setAttributes({ columnCount: count, columnWidths: newColumnWidths });
-        };
-
-        useEffect(() => {
-            const row = rowRef.current;
-            if (!row) return;
-
-            const resizer = document.createElement('div');
-            resizer.className = 'column-resizer';
-            resizer.style.cssText = 'width: 5px; background: #007cba; cursor: col-resize; position: absolute; top: 0; bottom: 0; right: -2.5px; opacity: 0; transition: opacity 0.3s;';
-
-            const columns = row.querySelectorAll('.wp-block-gutenberg-layout-blocks-column');
-            columns.forEach((column, index) => {
-                if (index < columns.length - 1) {
-                    const columnResizer = resizer.cloneNode();
-                    column.style.position = 'relative';
-                    column.appendChild(columnResizer);
-
-                    let startX, startWidths;
-
-                    const resize = (e) => {
-                        const diff = e.pageX - startX;
-                        const newWidths = startWidths.map((width, i) => {
-                            if (i === index) return width + (diff / row.offsetWidth) * 100;
-                            if (i === index + 1) return width - (diff / row.offsetWidth) * 100;
-                            return width;
-                        });
-
-                        if (newWidths[index] > 10 && newWidths[index + 1] > 10) {
-                            setAttributes({ columnWidths: newWidths });
-                        }
-                    };
-
-                    const stopResize = () => {
-                        window.removeEventListener('mousemove', resize);
-                        window.removeEventListener('mouseup', stopResize);
-                        columnResizer.style.opacity = '0';
-                    };
-
-                    columnResizer.addEventListener('mousedown', (e) => {
-                        startX = e.pageX;
-                        startWidths = [...attributes.columnWidths];
-                        window.addEventListener('mousemove', resize);
-                        window.addEventListener('mouseup', stopResize);
-                        columnResizer.style.opacity = '1';
-                    });
-
-                    column.addEventListener('mouseover', () => {
-                        columnResizer.style.opacity = '0.5';
-                    });
-
-                    column.addEventListener('mouseout', () => {
-                        if (!columnResizer.matches(':active')) {
-                            columnResizer.style.opacity = '0';
-                        }
-                    });
-                }
-            });
-        }, [attributes.columnWidths]);
 
         return (
             <>
@@ -152,7 +67,7 @@ registerBlockType('gutenberg-layout-blocks/row', {
                             <RangeControl
                                 label="Column Count"
                                 value={attributes.columnCount}
-                                onChange={updateColumnCount}
+                                onChange={(value) => setAttributes({ columnCount: value })}
                                 min={1}
                                 max={6}
                             />
@@ -195,7 +110,6 @@ registerBlockType('gutenberg-layout-blocks/row', {
                     )}
                 </InspectorControls>
                 <div
-                    ref={rowRef}
                     className="gutenberg-layout-blocks-row"
                     style={{
                         backgroundColor: attributes.backgroundColor,
