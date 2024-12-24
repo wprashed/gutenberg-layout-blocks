@@ -6,7 +6,7 @@ import {
     ToggleControl, 
     Button, 
     RangeControl, 
-    SelectControl, 
+    SelectControl,
     __experimentalGradientPicker as GradientPicker 
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
