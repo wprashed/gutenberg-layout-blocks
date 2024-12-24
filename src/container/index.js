@@ -1,6 +1,14 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks, InspectorControls, MediaUpload, MediaUploadCheck, ColorPalette } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl, Button, RangeControl, SelectControl, RadioControl } from '@wordpress/components';
+import { 
+    PanelBody, 
+    TextControl, 
+    ToggleControl, 
+    Button, 
+    RangeControl, 
+    SelectControl, 
+    __experimentalGradientPicker as GradientPicker 
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 registerBlockType('gutenberg-layout-blocks/container', {
@@ -18,6 +26,7 @@ registerBlockType('gutenberg-layout-blocks/container', {
         backgroundAttachment: { type: 'string', default: 'scroll' },
         backgroundRepeat: { type: 'string', default: 'no-repeat' },
         backgroundSize: { type: 'string', default: 'cover' },
+        gradient: { type: 'string', default: '' },
         overlayColor: { type: 'string', default: '' },
         overlayOpacity: { type: 'number', default: 0.5 },
         padding: { type: 'object', default: { top: 10, right: 10, bottom: 10, left: 10, unit: 'px' } },
@@ -156,8 +165,10 @@ registerBlockType('gutenberg-layout-blocks/container', {
                                 </>
                             )}
                             {attributes.backgroundType === 'gradient' && (
-                                // Add gradient controls here
-                                <p>Gradient controls to be implemented</p>
+                                <GradientPicker
+                                    value={attributes.gradient}
+                                    onChange={(value) => setAttributes({ gradient: value })}
+                                />
                             )}
                             <ColorPalette
                                 value={attributes.overlayColor}
@@ -211,8 +222,8 @@ registerBlockType('gutenberg-layout-blocks/container', {
                 <div
                     className="gutenberg-layout-blocks-container"
                     style={{
-                        backgroundColor: attributes.backgroundColor,
-                        backgroundImage: attributes.backgroundImage ? `url(${attributes.backgroundImage})` : 'none',
+                        backgroundColor: attributes.backgroundType === 'classic' ? attributes.backgroundColor : undefined,
+                        backgroundImage: attributes.backgroundType === 'classic' && attributes.backgroundImage ? `url(${attributes.backgroundImage})` : attributes.backgroundType === 'gradient' ? attributes.gradient : 'none',
                         backgroundPosition: attributes.backgroundPosition,
                         backgroundAttachment: attributes.backgroundAttachment,
                         backgroundRepeat: attributes.backgroundRepeat,
@@ -238,7 +249,10 @@ registerBlockType('gutenberg-layout-blocks/container', {
                         />
                     )}
                     <div style={{ position: 'relative', zIndex: 1, maxWidth: attributes.contentWidth === 'boxed' ? `${attributes.width}px` : '100%', margin: '0 auto' }}>
-                        <InnerBlocks />
+                        <InnerBlocks
+                            allowedBlocks={['gutenberg-layout-blocks/row']}
+                            renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
+                        />
                     </div>
                 </div>
             </>
@@ -249,8 +263,8 @@ registerBlockType('gutenberg-layout-blocks/container', {
             <div
                 className="gutenberg-layout-blocks-container"
                 style={{
-                    backgroundColor: attributes.backgroundColor,
-                    backgroundImage: attributes.backgroundImage ? `url(${attributes.backgroundImage})` : 'none',
+                    backgroundColor: attributes.backgroundType === 'classic' ? attributes.backgroundColor : undefined,
+                    backgroundImage: attributes.backgroundType === 'classic' && attributes.backgroundImage ? `url(${attributes.backgroundImage})` : attributes.backgroundType === 'gradient' ? attributes.gradient : 'none',
                     backgroundPosition: attributes.backgroundPosition,
                     backgroundAttachment: attributes.backgroundAttachment,
                     backgroundRepeat: attributes.backgroundRepeat,
@@ -282,3 +296,4 @@ registerBlockType('gutenberg-layout-blocks/container', {
         );
     },
 });
+
