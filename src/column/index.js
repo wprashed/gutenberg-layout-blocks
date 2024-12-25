@@ -3,7 +3,6 @@ import { InnerBlocks, InspectorControls, ColorPalette } from '@wordpress/block-e
 import { PanelBody, RangeControl, SelectControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { cloneBlock } from '@wordpress/blocks';
 
 registerBlockType('gutenberg-layout-blocks/column', {
     title: 'Column',
@@ -30,11 +29,10 @@ registerBlockType('gutenberg-layout-blocks/column', {
             });
         };
 
-        constduplicateColumn = () => {
+        const duplicateColumn = () => {
             const parentClientId = getBlockRootClientId(clientId);
             const parentBlocks = getBlocks(parentClientId);
             const columnIndex = parentBlocks.findIndex(block => block.clientId === clientId);
-            const newColumnClientId = cloneBlock(clientId).clientId;
             duplicateBlocks([clientId]);
             
             // Update column widths
@@ -61,7 +59,7 @@ registerBlockType('gutenberg-layout-blocks/column', {
                                 label="Width (%)"
                                 value={attributes.width}
                                 onChange={(value) => setAttributes({ width: value })}
-                                min={0}
+                                min={10}
                                 max={100}
                             />
                             <SelectControl
@@ -74,9 +72,6 @@ registerBlockType('gutenberg-layout-blocks/column', {
                                 ]}
                                 onChange={(value) => setAttributes({ verticalAlignment: value })}
                             />
-                            <Button isPrimary onClick={duplicateColumn}>
-                                Duplicate Column
-                            </Button>
                         </PanelBody>
                     )}
                     {activeTab === 'style' && (
@@ -123,12 +118,17 @@ registerBlockType('gutenberg-layout-blocks/column', {
                         padding: `${attributes.padding.top}${attributes.padding.unit} ${attributes.padding.right}${attributes.padding.unit} ${attributes.padding.bottom}${attributes.padding.unit} ${attributes.padding.left}${attributes.padding.unit}`,
                         margin: `${attributes.margin.top}${attributes.margin.unit} ${attributes.margin.right}${attributes.margin.unit} ${attributes.margin.bottom}${attributes.margin.unit} ${attributes.margin.left}${attributes.margin.unit}`,
                         display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: attributes.verticalAlignment === 'top' ? 'flex-start' : attributes.verticalAlignment === 'middle' ? 'center' : 'flex-end',
+                        flexDirection: 'column', // Stack the blocks vertically
+                        alignItems: attributes.verticalAlignment === 'top' ? 'flex-start' : attributes.verticalAlignment === 'middle' ? 'center' : 'flex-end',
                     }}
                 >
-                    <InnerBlocks />
+                    <InnerBlocks
+                        allowedBlocks={['core/paragraph', 'core/heading', 'core/list', 'core/image']} // Allow more blocks
+                        orientation="vertical"
+                        renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
+                    />
                 </div>
+                <Button isPrimary onClick={duplicateColumn}>Duplicate Column</Button>
             </>
         );
     },
@@ -142,8 +142,8 @@ registerBlockType('gutenberg-layout-blocks/column', {
                     padding: `${attributes.padding.top}${attributes.padding.unit} ${attributes.padding.right}${attributes.padding.unit} ${attributes.padding.bottom}${attributes.padding.unit} ${attributes.padding.left}${attributes.padding.unit}`,
                     margin: `${attributes.margin.top}${attributes.margin.unit} ${attributes.margin.right}${attributes.margin.unit} ${attributes.margin.bottom}${attributes.margin.unit} ${attributes.margin.left}${attributes.margin.unit}`,
                     display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: attributes.verticalAlignment === 'top' ? 'flex-start' : attributes.verticalAlignment === 'middle' ? 'center' : 'flex-end',
+                    flexDirection: 'column', // Ensure content is stacked vertically
+                    alignItems: attributes.verticalAlignment === 'top' ? 'flex-start' : attributes.verticalAlignment === 'middle' ? 'center' : 'flex-end',
                 }}
             >
                 <InnerBlocks.Content />
@@ -151,4 +151,3 @@ registerBlockType('gutenberg-layout-blocks/column', {
         );
     },
 });
-
