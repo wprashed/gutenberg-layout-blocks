@@ -1,6 +1,6 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks, InspectorControls, ColorPalette } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, SelectControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, RangeControl, SelectControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 registerBlockType('gutenberg-layout-blocks/row', {
@@ -13,7 +13,7 @@ registerBlockType('gutenberg-layout-blocks/row', {
         contentWidth: { type: 'string', default: 'full' },
         columnCount: { type: 'number', default: 2 },
         backgroundColor: { type: 'string', default: '' },
-        padding: { type:'object', default: { top: 10, right: 10, bottom: 10, left: 10, unit: 'px' } },
+        padding: { type: 'object', default: { top: 10, right: 10, bottom: 10, left: 10, unit: 'px' } },
         margin: { type: 'object', default: { top: 0, right: 0, bottom: 0, left: 0, unit: 'px' } },
     },
     edit: ({ attributes, setAttributes }) => {
@@ -163,4 +163,3 @@ registerBlockType('gutenberg-layout-blocks/row', {
         );
     },
 });
-
